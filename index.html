@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Tarefas com Prioridades</title>
+    <style>
+        .prioridadeSelecionada {
+            font-size: 20px;
+        }
+        .tarefaRealizada {
+            background-color: blue;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Minha Lista de Tarefas</h1>
+
+    <h2>Prioridades:</h2>
+    <button id="prioridadeAlta" style="background-color: red;" onclick="definirPrioridade('red')">Alta</button>
+    <button id="prioridadeMedia" style="background-color: yellow;" onclick="definirPrioridade('yellow')">Média</button>
+    <button id="prioridadeBaixa" style="background-color: green;" onclick="definirPrioridade('green')">Baixa</button>
+
+    <input type="hidden" id="prioridade" value="green"> <!-- Valor padrão para a prioridade -->
+
+    <input type="text" id="tarefa" placeholder="O Que Aconteceu ?">
+    <input type="text" id="numeroOs" placeholder="Número de OS">
+    <input type="text" id="placeholderConcatenar" placeholder="Setor:">
+    <button onclick="adicionarOuConcatenarTarefa()">Salvar</button>
+
+    <h2>Tarefas:</h2>
+    <ul id="listaTarefas"></ul>
+
+    <h2>Tarefas Realizadas:</h2>
+    <ul id="listaTarefasRealizadas"></ul>
+
+    <script>
+        var tarefas = []; // Array para armazenar as tarefas
+        var tarefasRealizadas = []; // Array para armazenar as tarefas realizadas
+
+        // Função para salvar as tarefas no Local Storage
+        function salvarTarefas() {
+            localStorage.setItem("tarefas", JSON.stringify(tarefas));
+        }
+
+        // Função para salvar as tarefas realizadas no Local Storage
+        function salvarTarefasRealizadas() {
+            localStorage.setItem("tarefasRealizadas", JSON.stringify(tarefasRealizadas));
+        }
+
+        // Função para carregar as tarefas do Local Storage
+        function carregarTarefas() {
+            var tarefasSalvas = localStorage.getItem("tarefas");
+            if (tarefasSalvas) {
+                tarefas = JSON.parse(tarefasSalvas);
+                exibirTarefas();
+            }
+        }
+
+        // Função para carregar as tarefas realizadas do Local Storage
+        function carregarTarefasRealizadas() {
+            var tarefasRealizadasSalvas = localStorage.getItem("tarefasRealizadas");
+            if (tarefasRealizadasSalvas) {
+                tarefasRealizadas = JSON.parse(tarefasRealizadasSalvas);
+                exibirTarefasRealizadas();
+            }
+        }
+
+        // Função para exibir as tarefas na lista
+        function exibirTarefas() {
+            var listaTarefas = document.getElementById("listaTarefas");
+            listaTarefas.innerHTML = "";
+
+            for (var i = 0; i < tarefas.length; i++) {
+                var tarefa = tarefas[i];
+                var novaTarefa = document.createElement("li");
+                novaTarefa.innerHTML = `<span style="color: ${tarefa.prioridade};">${tarefa.tarefa} - OS ${tarefa.numeroOs} - Setor: ${tarefa.textoConcatenar}</span>`;
+                var botaoRealizada = document.createElement("button");
+                botaoRealizada.innerText = "Tarefa Realizada";
+                botaoRealizada.onclick = function(index) {
+                    return function() {
+                        marcarTarefaRealizada(index);
+                    }
+                }(i);
+                novaTarefa.appendChild(botaoRealizada);
+                listaTarefas.appendChild(novaTarefa);
+            }
+        }
+
+        // Função para exibir as tarefas realizadas na lista
+        function exibirTarefasRealizadas() {
+            var listaTarefasRealizadas = document.getElementById("listaTarefasRealizadas");
+            listaTarefasRealizadas.innerHTML = "";
+
+            for (var i = 0; i < tarefasRealizadas.length; i++) {
+                var tarefaRealizada = tarefasRealizadas[i];
+                var novaTarefaRealizada = document.createElement("li");
+                novaTarefaRealizada.innerHTML = `<span class="tarefaRealizada">${tarefaRealizada.tarefa} - OS ${tarefaRealizada.numeroOs} - Setor: ${tarefaRealizada.textoConcatenar}</span>`;
+                var botaoApagar = document.createElement("button");
+                botaoApagar.innerText = "Apagar";
+                botaoApagar.onclick = function(index) {
+                    return function() {
+                        apagarTarefaRealizada(index);
+                    }
+                }(i);
+                novaTarefaRealizada.appendChild(botaoApagar);
+                listaTarefasRealizadas.appendChild(novaTarefaRealizada);
+            }
+        }
+
+        // Função para marcar uma tarefa como realizada
+        function marcarTarefaRealizada(index) {
+            var tarefaRealizada = tarefas.splice(index, 1)[0];
+            tarefasRealizadas.push(tarefaRealizada);
+            salvarTarefas();
+            salvarTarefasRealizadas();
+            exibirTarefas();
+            exibirTarefasRealizadas();
+        }
+
+        // Função para apagar uma tarefa realizada específica
+        function apagarTarefaRealizada(index) {
+            tarefasRealizadas.splice(index, 1);
+            salvarTarefasRealizadas();
+            exibirTarefasRealizadas();
+        }
+
+        function adicionarOuConcatenarTarefa() {
+            var tarefa = document.getElementById("tarefa").value;
+            if (tarefa === "") {
+                alert("Por favor, digite uma tarefa.");
+                return;
+            }
+
+            // Obtém a prioridade atual selecionada
+            var prioridade = document.getElementById("prioridade").value;
+
+            // Obtém o número de OS
+            var numeroOs = document.getElementById("numeroOs").value;
+
+            // Obtém o texto para concatenar
+            var textoConcatenar = document.getElementById("placeholderConcatenar").value;
+
+            // Adiciona a tarefa ao array
+            tarefas.push({ tarefa, prioridade, numeroOs, textoConcatenar });
+
+            // Salva as tarefas no Local Storage
+            salvarTarefas();
+
+            // Limpa os campos de entrada
+            document.getElementById("tarefa").value = "";
+            document.getElementById("numeroOs").value = "";
+            document.getElementById("placeholderConcatenar").value = "";
+
+            // Atualiza a lista de tarefas
+            exibirTarefas();
+        }
+
+        function definirPrioridade(cor) {
+            document.getElementById("prioridade").value = cor;
+
+            // Define a classe de prioridade selecionada para o botão atual
+            document.getElementById("prioridadeAlta").classList.remove("prioridadeSelecionada");
+            document.getElementById("prioridadeMedia").classList.remove("prioridadeSelecionada");
+            document.getElementById("prioridadeBaixa").classList.remove("prioridadeSelecionada");
+
+            if (cor === 'red') {
+                document.getElementById("prioridadeAlta").classList.add("prioridadeSelecionada");
+            } else if (cor === 'yellow') {
+                document.getElementById("prioridadeMedia").classList.add("prioridadeSelecionada");
+            } else {
+                document.getElementById("prioridadeBaixa").classList.add("prioridadeSelecionada");
+            }
+        }
+
+        // Carrega as tarefas do Local Storage ao carregar a página
+        carregarTarefas();
+        carregarTarefasRealizadas();
+    </script>
+</body>
+</html>
