@@ -32,7 +32,8 @@
     <input type="hidden" id="prioridade" value="green"> <!-- Valor padrão para a prioridade -->
 
     <input type="text" id="tarefa" placeholder="O Que Aconteceu ?">
-    <input type="text" id="numeroOs" placeholder="Número de OS">
+    <input type="text"id="numeroOs"placeholder="Número de OS"onkeypress="return isNumber(event)"
+>
     <input type="text" id="placeholderConcatenar" placeholder="Setor:">
     
     <!-- Adicione um campo de entrada para a pessoa responsável -->
@@ -75,6 +76,20 @@
             }
             return array;
         }
+// Função para verificar se o evento contém um número
+function isNumber(event) {
+    var charCode = event.which || event.keyCode;
+
+    // Garanta que apenas números sejam aceitos (códigos de tecla 48 a 57 são números)
+    if (charCode < 48 || charCode > 57) {
+        event.preventDefault();
+        return false;
+    }
+
+    return true;
+}
+
+        
 
         // Função para exibir os dados em uma lista
         function exibirDados(array, listaId) {
@@ -172,11 +187,8 @@
             // Obtenha a pessoa responsável da entrada correspondente
             var responsavel = document.getElementById("responsavel").value;
             
-            // Verifique se já existe um responsável definido na tarefa
-            if (!tarefaEmAndamento.responsavel) {
-                // Adicione a pessoa responsável à atividade em andamento
-                tarefaEmAndamento.responsavel = responsavel;
-            }
+            // Adicione a pessoa responsável à atividade em andamento
+            tarefaEmAndamento.responsavel = responsavel;
             
             atividadesEmAndamento.push(tarefaEmAndamento);
             tarefas = salvarDados("tarefas", tarefas);
