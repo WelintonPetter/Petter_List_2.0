@@ -21,9 +21,9 @@
 
     <h2>Prioridades:</h2>
     <div id="prioridadeButtons">
-        <button id="prioridadeAlta" data-cor="red">Alta</button>
-        <button id="prioridadeMedia" data-cor="yellow">Média</button>
-        <button id="prioridadeBaixa" data-cor="green">Baixa</button>
+        <button id="prioridadeAlta" data-cor="red" onclick="definirPrioridade('red')">Alta</button>
+        <button id="prioridadeMedia" data-cor="yellow" onclick="definirPrioridade('yellow')">Média</button>
+        <button id="prioridadeBaixa" data-cor="green" onclick="definirPrioridade('green')">Baixa</button>
     </div>
 
     <input type="hidden" id="prioridade" value="green"> <!-- Valor padrão para a prioridade -->
@@ -195,7 +195,7 @@
             }
 
             // Adiciona a tarefa ao array
-            tarefas.push({ tarefa, prioridade, numeroOs, textoConcatenar, dataVencimento });
+            tarefas.push({ tarefa, prioridade, numeroOs, textoConcatenar, dataVencimento, responsavel: "" });
 
             // Salva as tarefas no Local Storage
             salvarDados("tarefas", tarefas);
