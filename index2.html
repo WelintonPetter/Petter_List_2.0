@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lista de Tarefas com Prioridades</title>
+    <title>Lista de Tarefas com Prioridades, Prazo Máximo e Edição</title>
     <style>
         .prioridadeSelecionada {
             font-size: 20px;
@@ -13,6 +13,9 @@
         .tarefaVencida {
             background-color: red;
             color: white;
+        }
+        .atrasada {
+            text-decoration: line-through;
         }
     </style>
 </head>
@@ -33,10 +36,13 @@
     <input type="text" id="placeholderConcatenar" placeholder="Setor:">
     
     <!-- Adicione um campo de entrada para a pessoa responsável -->
-    <input type="text" id="responsavelInput" placeholder="Quem vai realizar a tarefa?">
+    <input type="text" id="responsavel" placeholder="Responsável pela Tarefa">
 
     <!-- Adicione um campo de entrada de data -->
     <input type="date" id="dataVencimento" placeholder="Data de Vencimento">
+    
+    <!-- Adicione um campo de entrada para o prazo máximo -->
+    <input type="number" id="prazoMaximo" placeholder="Prazo Máximo (em dias)">
 
     <button onclick="adicionarOuConcatenarTarefa()">Cadastrar Atividade</button>
 
@@ -86,7 +92,17 @@
                     novoItem.classList.add("tarefaVencida");
                 }
 
-                var descricao = `Acontecido: ${item.tarefa} - OS ${item.numeroOs} - Setor: ${item.textoConcatenar} - Tarefa: ${item.responsavel} - Vencimento: ${item.dataVencimento}`;
+                // Verifica se a atividade está atrasada com base no prazo máximo
+                var prazoMaximo = parseInt(item.prazoMaximo);
+                if (!isNaN(prazoMaximo)) {
+                    var dataLimite = new Date(item.dataVencimento);
+                    dataLimite.setDate(dataLimite.getDate() + prazoMaximo);
+                    if (hoje > dataLimite) {
+                        novoItem.classList.add("atrasada");
+                    }
+                }
+
+                var descricao = `Acontecido: ${item.tarefa} - OS ${item.numeroOs} - Setor: ${item.textoConcatenar} - Responsável: ${item.responsavel} - Vencimento: ${item.dataVencimento}`;
                 novoItem.innerHTML = `<span style="color: ${item.prioridade};">${descricao}</span>`;
 
                 if (listaId === "listaTarefas") {
@@ -98,6 +114,24 @@
                         }
                     }(i);
                     novoItem.appendChild(botaoIniciar);
+
+                    var botaoEditar = document.createElement("button");
+                    botaoEditar.innerText = "Editar";
+                    botaoEditar.onclick = function(index) {
+                        return function() {
+                            editarTarefa(index);
+                        }
+                    }(i);
+                    novoItem.appendChild(botaoEditar);
+
+                    var botaoExcluir = document.createElement("button");
+                    botaoExcluir.innerText = "Excluir";
+                    botaoExcluir.onclick = function(index) {
+                        return function() {
+                            excluirTarefa(index);
+                        }
+                    }(i);
+                    novoItem.appendChild(botaoExcluir);
                 } else if (listaId === "listaAtividadesEmAndamento") {
                     var botaoFinalizar = document.createElement("button");
                     botaoFinalizar.innerText = "Finalizar Atividade";
@@ -107,6 +141,15 @@
                         }
                     }(i);
                     novoItem.appendChild(botaoFinalizar);
+
+                    var botaoEditarEmAndamento = document.createElement("button");
+                    botaoEditarEmAndamento.innerText = "Editar";
+                    botaoEditarEmAndamento.onclick = function(index) {
+                        return function() {
+                            editarTarefa(index, true);
+                        }
+                    }(i);
+                    novoItem.appendChild(botaoEditarEmAndamento);
                 } else if (listaId === "listaAtividadesRealizadas") {
                     var botaoApagar = document.createElement("button");
                     botaoApagar.innerText = "Apagar";
@@ -127,7 +170,7 @@
             var tarefaEmAndamento = tarefas.splice(index, 1)[0];
             
             // Obtenha a pessoa responsável da entrada correspondente
-            var responsavel = document.getElementById("responsavelInput").value;
+            var responsavel = document.getElementById("responsavel").value;
             
             // Adicione a pessoa responsável à atividade em andamento
             tarefaEmAndamento.responsavel = responsavel;
@@ -139,9 +182,9 @@
             exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
             
             // Limpe o campo de entrada da pessoa responsável
-            document.getElementById("responsavelInput").value = "";
+            document.getElementById("responsavel").value = "";
             // Defina o placeholder novamente
-            document.getElementById("responsavelInput").placeholder = "Quem vai realizar a tarefa?";
+            document.getElementById("responsavel").placeholder = "Responsável pela Tarefa";
         }
 
         // Função para cadastrar uma atividade em andamento
@@ -152,6 +195,45 @@
             atividadesRealizadas = salvarDados("atividadesRealizadas", atividadesRealizadas);
             exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
             exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
+        }
+
+        // Função para editar uma tarefa
+        function editarTarefa(index, emAndamento = false) {
+            var array = emAndamento ? atividadesEmAndamento : tarefas;
+            var tarefa = array[index];
+            
+            // Preencha os campos de entrada com os valores atuais
+            document.getElementById("tarefa").value = tarefa.tarefa;
+            document.getElementById("numeroOs").value = tarefa.numeroOs;
+            document.getElementById("placeholderConcatenar").value = tarefa.textoConcatenar;
+            document.getElementById("prioridade").value = tarefa.prioridade;
+            document.getElementById("dataVencimento").value = tarefa.dataVencimento;
+            document.getElementById("prazoMaximo").value = tarefa.prazoMaximo;
+            
+            // Preencha o campo de responsável
+            document.getElementById("responsavel").value = tarefa.responsavel;
+            
+            // Remova a tarefa do array
+            array.splice(index, 1);
+            
+            // Atualize a lista de tarefas em andamento ou tarefas
+            if (emAndamento) {
+                atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
+                exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
+            } else {
+                tarefas = salvarDados("tarefas", tarefas);
+                exibirDados(tarefas, "listaTarefas");
+            }
+        }
+
+        // Função para apagar uma tarefa
+        function excluirTarefa(index) {
+            var confirmacao = confirm("Tem certeza de que deseja excluir esta tarefa?");
+            if (confirmacao) {
+                tarefas.splice(index, 1);
+                tarefas = salvarDados("tarefas", tarefas);
+                exibirDados(tarefas, "listaTarefas");
+            }
         }
 
         // Função para apagar uma atividade realizada específica com confirmação
@@ -195,8 +277,14 @@
                 return;
             }
 
+            // Obtém o prazo máximo (em dias)
+            var prazoMaximo = document.getElementById("prazoMaximo").value;
+
+            // Obtém a pessoa responsável
+            var responsavel = document.getElementById("responsavel").value;
+
             // Adiciona a tarefa ao array
-            tarefas.push({ tarefa, prioridade, numeroOs, textoConcatenar, dataVencimento, responsavel: "" });
+            tarefas.push({ tarefa, prioridade, numeroOs, textoConcatenar, dataVencimento, prazoMaximo, responsavel });
 
             // Salva as tarefas no Local Storage
             tarefas = salvarDados("tarefas", tarefas);
@@ -206,9 +294,11 @@
             document.getElementById("numeroOs").value = "";
             document.getElementById("placeholderConcatenar").value = "";
             document.getElementById("dataVencimento").value = "";
+            document.getElementById("prazoMaximo").value = "";
+            document.getElementById("responsavel").value = "";
 
-            // Atualiza o placeholder do input de responsável para "Quem vai realizar a tarefa?"
-            document.getElementById("responsavelInput").placeholder = "Quem vai realizar a tarefa?";
+            // Atualiza o placeholder do input de responsável para "Responsável pela Tarefa"
+            document.getElementById("responsavel").placeholder = "Responsável pela Tarefa";
 
             // Atualiza a lista de tarefas
             exibirDados(tarefas, "listaTarefas");
