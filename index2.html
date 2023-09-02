@@ -20,22 +20,25 @@
     <h1>Minha Lista de Tarefas</h1>
 
     <h2>Prioridades:</h2>
-    <button id="prioridadeAlta" style="background-color: red;" onclick="definirPrioridade('red')">Alta</button>
-    <button id="prioridadeMedia" style="background-color: yellow;" onclick="definirPrioridade('yellow')">Média</button>
-    <button id="prioridadeBaixa" style="background-color: green;" onclick="definirPrioridade('green')">Baixa</button>
+    <div id="prioridadeButtons">
+        <button id="prioridadeAlta" data-cor="red" onclick="definirPrioridade('red')">Alta</button>
+        <button id="prioridadeMedia" data-cor="yellow" onclick="definirPrioridade('yellow')">Média</button>
+        <button id="prioridadeBaixa" data-cor="green" onclick="definirPrioridade('green')">Baixa</button>
+    </div>
 
     <input type="hidden" id="prioridade" value="green"> <!-- Valor padrão para a prioridade -->
 
     <input type="text" id="tarefa" placeholder="O Que Aconteceu ?">
     <input type="text" id="numeroOs" placeholder="Número de OS">
     <input type="text" id="placeholderConcatenar" placeholder="Setor:">
-
-    <input type="text" id="responsavelInput" placeholder="Tarefa:"> <!-- Campo de responsável com o placeholder inicial "Tarefas" -->
     
+    <!-- Adicione um campo de entrada para a pessoa responsável -->
+    <input type="text" id="responsavelInput" placeholder="Quem vai realizar a tarefa?">
+
     <!-- Adicione um campo de entrada de data -->
     <input type="date" id="dataVencimento" placeholder="Data de Vencimento">
 
-    <button onclick="adicionarOuConcatenarTarefa()">Cadastar Atividade</button>
+    <button onclick="adicionarOuConcatenarTarefa()">Cadastrar Atividade</button>
 
     <h2>Tarefas:</h2>
     <ul id="listaTarefas"></ul>
@@ -51,147 +54,117 @@
         var atividadesEmAndamento = []; // Array para armazenar as atividades em andamento
         var atividadesRealizadas = []; // Array para armazenar as atividades realizadas
 
-        // Função para salvar as tarefas no Local Storage
-        function salvarTarefas() {
-            localStorage.setItem("tarefas", JSON.stringify(tarefas));
+        // Função para salvar os dados no Local Storage e retornar os dados atualizados
+        function salvarDados(chave, dados) {
+            localStorage.setItem(chave, JSON.stringify(dados));
+            return dados; // Retorna os dados atualizados
         }
 
-        // Função para salvar as atividades em andamento no Local Storage
-        function salvarAtividadesEmAndamento() {
-            localStorage.setItem("atividadesEmAndamento", JSON.stringify(atividadesEmAndamento));
-        }
-
-        // Função para salvar as atividades realizadas no Local Storage
-        function salvarAtividadesRealizadas() {
-            localStorage.setItem("atividadesRealizadas", JSON.stringify(atividadesRealizadas));
-        }
-
-        // Função para carregar as tarefas do Local Storage
-        function carregarTarefas() {
-            var tarefasSalvas = localStorage.getItem("tarefas");
-            if (tarefasSalvas) {
-                tarefas = JSON.parse(tarefasSalvas);
-                exibirTarefas();
+        // Função para carregar os dados do Local Storage
+        function carregarDados(chave, array) {
+            var dadosSalvos = localStorage.getItem(chave);
+            if (dadosSalvos) {
+                array = JSON.parse(dadosSalvos);
+                return array;
             }
+            return array;
         }
 
-        // Função para carregar as atividades em andamento do Local Storage
-        function carregarAtividadesEmAndamento() {
-            var atividadesEmAndamentoSalvas = localStorage.getItem("atividadesEmAndamento");
-            if (atividadesEmAndamentoSalvas) {
-                atividadesEmAndamento = JSON.parse(atividadesEmAndamentoSalvas);
-                exibirAtividadesEmAndamento();
-            }
-        }
+        // Função para exibir os dados em uma lista
+        function exibirDados(array, listaId) {
+            var lista = document.getElementById(listaId);
+            lista.innerHTML = "";
 
-        // Função para carregar as atividades realizadas do Local Storage
-        function carregarAtividadesRealizadas() {
-            var atividadesRealizadasSalvas = localStorage.getItem("atividadesRealizadas");
-            if (atividadesRealizadasSalvas) {
-                atividadesRealizadas = JSON.parse(atividadesRealizadasSalvas);
-                exibirAtividadesRealizadas();
-            }
-        }
+            for (var i = 0; i < array.length; i++) {
+                var item = array[i];
+                var novoItem = document.createElement("li");
 
-        // Função para exibir as tarefas na lista
-        function exibirTarefas() {
-            var listaTarefas = document.getElementById("listaTarefas");
-            listaTarefas.innerHTML = "";
-
-            for (var i = 0; i < tarefas.length; i++) {
-                var tarefa = tarefas[i];
-                var novaTarefa = document.createElement("li");
-
-                // Verifica se a tarefa está vencida
-                var dataVencimento = new Date(tarefa.dataVencimento);
+                // Verifica se o item está vencido
+                var dataVencimento = new Date(item.dataVencimento);
                 var hoje = new Date();
                 if (dataVencimento < hoje) {
-                    novaTarefa.classList.add("tarefaVencida");
+                    novoItem.classList.add("tarefaVencida");
                 }
 
-                novaTarefa.innerHTML = `<span style="color: ${tarefa.prioridade};"> Acontecido: ${tarefa.tarefa} - OS ${tarefa.numeroOs} - Setor: ${tarefa.textoConcatenar} - Tarefa: ${tarefa.responsavel} - Vencimento: ${tarefa.dataVencimento}</span>`;
+                var descricao = `Acontecido: ${item.tarefa} - OS ${item.numeroOs} - Setor: ${item.textoConcatenar} - Tarefa: ${item.responsavel} - Vencimento: ${item.dataVencimento}`;
+                novoItem.innerHTML = `<span style="color: ${item.prioridade};">${descricao}</span>`;
 
-                var botaoRealizada = document.createElement("button");
+                if (listaId === "listaTarefas") {
+                    var botaoIniciar = document.createElement("button");
+                    botaoIniciar.innerText = "Iniciar Atividade";
+                    botaoIniciar.onclick = function(index) {
+                        return function() {
+                            marcarTarefaEmAndamento(index);
+                        }
+                    }(i);
+                    novoItem.appendChild(botaoIniciar);
+                } else if (listaId === "listaAtividadesEmAndamento") {
+                    var botaoFinalizar = document.createElement("button");
+                    botaoFinalizar.innerText = "Finalizar Atividade";
+                    botaoFinalizar.onclick = function(index) {
+                        return function() {
+                            cadastrarAtividade(index);
+                        }
+                    }(i);
+                    novoItem.appendChild(botaoFinalizar);
+                } else if (listaId === "listaAtividadesRealizadas") {
+                    var botaoApagar = document.createElement("button");
+                    botaoApagar.innerText = "Apagar";
+                    botaoApagar.onclick = function(index) {
+                        return function() {
+                            apagarAtividadeRealizada(index);
+                        }
+                    }(i);
+                    novoItem.appendChild(botaoApagar);
+                }
 
-                botaoRealizada.innerText = "Iniciar Atividade";
-                botaoRealizada.onclick = function(index) {
-                    return function() {
-                        marcarTarefaEmAndamento(index);
-                    }
-                }(i);
-                novaTarefa.appendChild(botaoRealizada);
-                listaTarefas.appendChild(novaTarefa);
-            }
-        }
-
-        // Função para exibir as atividades em andamento na lista
-        function exibirAtividadesEmAndamento() {
-            var listaAtividadesEmAndamento = document.getElementById("listaAtividadesEmAndamento");
-            listaAtividadesEmAndamento.innerHTML = "";
-
-            for (var i = 0; i < atividadesEmAndamento.length; i++) {
-                var atividade = atividadesEmAndamento[i];
-                var novaAtividade = document.createElement("li");
-                novaAtividade.innerHTML = `<span style="color: ${atividade.prioridade};">Acontecido: ${atividade.tarefa} - OS ${atividade.numeroOs} - Setor: ${atividade.textoConcatenar} - Tarefa: ${atividade.responsavel} - Vencimento: ${atividade.dataVencimento}</span>`;
-                var botaoCadastrarAtividade = document.createElement("button");
-                botaoCadastrarAtividade.innerText = "Finalizar Atividade";
-                botaoCadastrarAtividade.onclick = function(index) {
-                    return function() {
-                        cadastrarAtividade(index);
-                    }
-                }(i);
-                novaAtividade.appendChild(botaoCadastrarAtividade);
-                listaAtividadesEmAndamento.appendChild(novaAtividade);
-            }
-        }
-
-        // Função para exibir as atividades realizadas na lista
-        function exibirAtividadesRealizadas() {
-            var listaAtividadesRealizadas = document.getElementById("listaAtividadesRealizadas");
-            listaAtividadesRealizadas.innerHTML = "";
-
-            for (var i = 0; i < atividadesRealizadas.length; i++) {
-                var atividadeRealizada = atividadesRealizadas[i];
-                var novaAtividadeRealizada = document.createElement("li");
-                novaAtividadeRealizada.innerHTML = `<span class="tarefaRealizada"> Acontecido: ${atividadeRealizada.tarefa} - OS ${atividadeRealizada.numeroOs} - Setor: ${atividadeRealizada.textoConcatenar} - Tarefa: ${atividadeRealizada.responsavel} - Vencimento: ${atividadeRealizada.dataVencimento}</span>`;
-                var botaoApagar = document.createElement("button");
-                botaoApagar.innerText = "Apagar";
-                botaoApagar.onclick = function(index) {
-                    return function() {
-                        apagarAtividadeRealizada(index);
-                    }
-                }(i);
-                novaAtividadeRealizada.appendChild(botaoApagar);
-                listaAtividadesRealizadas.appendChild(novaAtividadeRealizada);
+                lista.appendChild(novoItem);
             }
         }
 
         // Função para marcar uma tarefa como em andamento
         function marcarTarefaEmAndamento(index) {
             var tarefaEmAndamento = tarefas.splice(index, 1)[0];
+            
+            // Obtenha a pessoa responsável da entrada correspondente
+            var responsavel = document.getElementById("responsavelInput").value;
+            
+            // Adicione a pessoa responsável à atividade em andamento
+            tarefaEmAndamento.responsavel = responsavel;
+            
             atividadesEmAndamento.push(tarefaEmAndamento);
-            salvarTarefas();
-            salvarAtividadesEmAndamento();
-            exibirTarefas();
-            exibirAtividadesEmAndamento();
+            tarefas = salvarDados("tarefas", tarefas);
+            atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
+            exibirDados(tarefas, "listaTarefas");
+            exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
+            
+            // Limpe o campo de entrada da pessoa responsável
+            document.getElementById("responsavelInput").value = "";
+            // Defina o placeholder novamente
+            document.getElementById("responsavelInput").placeholder = "Quem vai realizar a tarefa?";
         }
 
         // Função para cadastrar uma atividade em andamento
         function cadastrarAtividade(index) {
             var atividade = atividadesEmAndamento.splice(index, 1)[0];
             atividadesRealizadas.push(atividade);
-            salvarAtividadesRealizadas();
-            exibirAtividadesEmAndamento();
-            exibirAtividadesRealizadas();
+            atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
+            atividadesRealizadas = salvarDados("atividadesRealizadas", atividadesRealizadas);
+            exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
+            exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
         }
 
-        // Função para apagar uma atividade realizada específica
+        // Função para apagar uma atividade realizada específica com confirmação
         function apagarAtividadeRealizada(index) {
-            atividadesRealizadas.splice(index, 1);
-            salvarAtividadesRealizadas();
-            exibirAtividadesRealizadas();
+            var confirmacao = confirm("Tem certeza de que deseja apagar esta atividade realizada?");
+            if (confirmacao) {
+                atividadesRealizadas.splice(index, 1);
+                atividadesRealizadas = salvarDados("atividadesRealizadas", atividadesRealizadas);
+                exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
+            }
         }
 
+        // Função para adicionar ou concatenar uma tarefa
         function adicionarOuConcatenarTarefa() {
             var tarefa = document.getElementById("tarefa").value;
             if (tarefa === "") {
@@ -208,49 +181,62 @@
             // Obtém o texto para concatenar
             var textoConcatenar = document.getElementById("placeholderConcatenar").value;
 
-            // Obtém a data de vencimento
+            // Obtém a data de vencimento e valide-a
             var dataVencimento = document.getElementById("dataVencimento").value;
+            if (!dataVencimento) {
+                alert("Por favor, selecione uma data de vencimento.");
+                return;
+            }
+
+            // Converta a data de vencimento em um objeto Date e verifique se é uma data válida
+            var dataVencimentoObj = new Date(dataVencimento);
+            if (isNaN(dataVencimentoObj.getTime())) {
+                alert("A data de vencimento inserida não é válida.");
+                return;
+            }
 
             // Adiciona a tarefa ao array
-            tarefas.push({ tarefa, prioridade, numeroOs, textoConcatenar, dataVencimento });
+            tarefas.push({ tarefa, prioridade, numeroOs, textoConcatenar, dataVencimento, responsavel: "" });
 
             // Salva as tarefas no Local Storage
-            salvarTarefas();
+            tarefas = salvarDados("tarefas", tarefas);
 
             // Limpa os campos de entrada
             document.getElementById("tarefa").value = "";
             document.getElementById("numeroOs").value = "";
             document.getElementById("placeholderConcatenar").value = "";
-            document.getElementById("dataVencimento").value = ""; // Limpa o campo de data de vencimento
+            document.getElementById("dataVencimento").value = "";
 
-            // Atualiza o placeholder do input de responsável para "Tarefas"
-            document.getElementById("responsavelInput").placeholder = "Tarefa:";
+            // Atualiza o placeholder do input de responsável para "Quem vai realizar a tarefa?"
+            document.getElementById("responsavelInput").placeholder = "Quem vai realizar a tarefa?";
 
             // Atualiza a lista de tarefas
-            exibirTarefas();
+            exibirDados(tarefas, "listaTarefas");
         }
 
+        // Função para definir a prioridade
         function definirPrioridade(cor) {
             document.getElementById("prioridade").value = cor;
 
             // Define a classe de prioridade selecionada para o botão atual
-            document.getElementById("prioridadeAlta").classList.remove("prioridadeSelecionada");
-            document.getElementById("prioridadeMedia").classList.remove("prioridadeSelecionada");
-            document.getElementById("prioridadeBaixa").classList.remove("prioridadeSelecionada");
-
-            if (cor === 'red') {
-                document.getElementById("prioridadeAlta").classList.add("prioridadeSelecionada");
-            } else if (cor === 'yellow') {
-                document.getElementById("prioridadeMedia").classList.add("prioridadeSelecionada");
-            } else {
-                document.getElementById("prioridadeBaixa").classList.add("prioridadeSelecionada");
-            }
+            var buttons = document.querySelectorAll("#prioridadeButtons button");
+            buttons.forEach(function(button) {
+                button.classList.remove("prioridadeSelecionada");
+                if (button.getAttribute("data-cor") === cor) {
+                    button.classList.add("prioridadeSelecionada");
+                }
+            });
         }
 
-        // Carrega as tarefas do Local Storage ao carregar a página
-        carregarTarefas();
-        carregarAtividadesEmAndamento();
-        carregarAtividadesRealizadas();
+        // Carrega os dados do Local Storage ao carregar a página
+        tarefas = carregarDados("tarefas", tarefas);
+        atividadesEmAndamento = carregarDados("atividadesEmAndamento", atividadesEmAndamento);
+        atividadesRealizadas = carregarDados("atividadesRealizadas", atividadesRealizadas);
+
+        // Exibe os dados carregados
+        exibirDados(tarefas, "listaTarefas");
+        exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
+        exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
     </script>
 </body>
 </html>
