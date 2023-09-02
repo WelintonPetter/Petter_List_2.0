@@ -33,13 +33,13 @@
     <h2>Atividades em Andamento:</h2>
     <ul id="listaAtividadesEmAndamento"></ul>
 
-    <h2>Tarefas Realizadas:</h2>
-    <ul id="listaTarefasRealizadas"></ul>
+    <h2>Atividades Realizadas:</h2>
+    <ul id="listaAtividadesRealizadas"></ul>
 
     <script>
         var tarefas = []; // Array para armazenar as tarefas
         var atividadesEmAndamento = []; // Array para armazenar as atividades em andamento
-        var tarefasRealizadas = []; // Array para armazenar as tarefas realizadas
+        var atividadesRealizadas = []; // Array para armazenar as atividades realizadas
 
         // Função para salvar as tarefas no Local Storage
         function salvarTarefas() {
@@ -51,9 +51,9 @@
             localStorage.setItem("atividadesEmAndamento", JSON.stringify(atividadesEmAndamento));
         }
 
-        // Função para salvar as tarefas realizadas no Local Storage
-        function salvarTarefasRealizadas() {
-            localStorage.setItem("tarefasRealizadas", JSON.stringify(tarefasRealizadas));
+        // Função para salvar as atividades realizadas no Local Storage
+        function salvarAtividadesRealizadas() {
+            localStorage.setItem("atividadesRealizadas", JSON.stringify(atividadesRealizadas));
         }
 
         // Função para carregar as tarefas do Local Storage
@@ -74,12 +74,12 @@
             }
         }
 
-        // Função para carregar as tarefas realizadas do Local Storage
-        function carregarTarefasRealizadas() {
-            var tarefasRealizadasSalvas = localStorage.getItem("tarefasRealizadas");
-            if (tarefasRealizadasSalvas) {
-                tarefasRealizadas = JSON.parse(tarefasRealizadasSalvas);
-                exibirTarefasRealizadas();
+        // Função para carregar as atividades realizadas do Local Storage
+        function carregarAtividadesRealizadas() {
+            var atividadesRealizadasSalvas = localStorage.getItem("atividadesRealizadas");
+            if (atividadesRealizadasSalvas) {
+                atividadesRealizadas = JSON.parse(atividadesRealizadasSalvas);
+                exibirAtividadesRealizadas();
             }
         }
 
@@ -125,24 +125,24 @@
             }
         }
 
-        // Função para exibir as tarefas realizadas na lista
-        function exibirTarefasRealizadas() {
-            var listaTarefasRealizadas = document.getElementById("listaTarefasRealizadas");
-            listaTarefasRealizadas.innerHTML = "";
+        // Função para exibir as atividades realizadas na lista
+        function exibirAtividadesRealizadas() {
+            var listaAtividadesRealizadas = document.getElementById("listaAtividadesRealizadas");
+            listaAtividadesRealizadas.innerHTML = "";
 
-            for (var i = 0; i < tarefasRealizadas.length; i++) {
-                var tarefaRealizada = tarefasRealizadas[i];
-                var novaTarefaRealizada = document.createElement("li");
-                novaTarefaRealizada.innerHTML = `<span class="tarefaRealizada">${tarefaRealizada.tarefa} - OS ${tarefaRealizada.numeroOs} - Setor: ${tarefaRealizada.textoConcatenar}</span>`;
+            for (var i = 0; i < atividadesRealizadas.length; i++) {
+                var atividadeRealizada = atividadesRealizadas[i];
+                var novaAtividadeRealizada = document.createElement("li");
+                novaAtividadeRealizada.innerHTML = `<span class="tarefaRealizada">${atividadeRealizada.tarefa} - OS ${atividadeRealizada.numeroOs} - Setor: ${atividadeRealizada.textoConcatenar}</span>`;
                 var botaoApagar = document.createElement("button");
                 botaoApagar.innerText = "Apagar";
                 botaoApagar.onclick = function(index) {
                     return function() {
-                        apagarTarefaRealizada(index);
+                        apagarAtividadeRealizada(index);
                     }
                 }(i);
-                novaTarefaRealizada.appendChild(botaoApagar);
-                listaTarefasRealizadas.appendChild(novaTarefaRealizada);
+                novaAtividadeRealizada.appendChild(botaoApagar);
+                listaAtividadesRealizadas.appendChild(novaAtividadeRealizada);
             }
         }
 
@@ -156,31 +156,20 @@
             exibirAtividadesEmAndamento();
         }
 
-        // Função para marcar uma tarefa como realizada
-        function marcarTarefaRealizada(index) {
-            var tarefaRealizada = tarefas.splice(index, 1)[0];
-            tarefasRealizadas.push(tarefaRealizada);
-            salvarTarefas();
-            salvarTarefasRealizadas();
-            exibirTarefas();
-            exibirTarefasRealizadas();
-        }
-
-        // Função para apagar uma tarefa realizada específica
-        function apagarTarefaRealizada(index) {
-            tarefasRealizadas.splice(index, 1);
-            salvarTarefasRealizadas();
-            exibirTarefasRealizadas();
-        }
-
         // Função para cadastrar uma atividade em andamento
         function cadastrarAtividade(index) {
             var atividade = atividadesEmAndamento.splice(index, 1)[0];
-            tarefas.push(atividade);
-            salvarAtividadesEmAndamento();
-            salvarTarefas();
+            atividadesRealizadas.push(atividade);
+            salvarAtividadesRealizadas();
             exibirAtividadesEmAndamento();
-            exibirTarefas();
+            exibirAtividadesRealizadas();
+        }
+
+        // Função para apagar uma atividade realizada específica
+        function apagarAtividadeRealizada(index) {
+            atividadesRealizadas.splice(index, 1);
+            salvarAtividadesRealizadas();
+            exibirAtividadesRealizadas();
         }
 
         function adicionarOuConcatenarTarefa() {
@@ -234,7 +223,7 @@
         // Carrega as tarefas do Local Storage ao carregar a página
         carregarTarefas();
         carregarAtividadesEmAndamento();
-        carregarTarefasRealizadas();
+        carregarAtividadesRealizadas();
     </script>
 </body>
 </html>
