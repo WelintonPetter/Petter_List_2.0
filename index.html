@@ -41,6 +41,8 @@
 
     <!-- Adicione um campo de entrada de data -->
     <input type="date" id="dataVencimento" placeholder="Data de Vencimento">
+    <button onclick="preencherDataDeHoje()">Hoje</button>
+
     
     <!-- Adicione um campo de entrada para o prazo máximo -->
     <input type="number" id="prazoMaximo" placeholder="Prazo Máximo (em dias)">
@@ -118,6 +120,7 @@ function isNumber(event) {
                 }
 
                 var descricao = `Acontecido: ${item.tarefa} - OS ${item.numeroOs} - Setor: ${item.textoConcatenar} - Responsável: ${item.responsavel} - Vencimento: ${item.dataVencimento}`;
+
                 novoItem.innerHTML = `<span style="color: ${item.prioridade};">${descricao}</span>`;
 
                 if (listaId === "listaTarefas") {
@@ -182,25 +185,27 @@ function isNumber(event) {
 
         // Função para marcar uma tarefa como em andamento
         function marcarTarefaEmAndamento(index) {
-            var tarefaEmAndamento = tarefas.splice(index, 1)[0];
-            
-            // Obtenha a pessoa responsável da entrada correspondente
-            var responsavel = document.getElementById("responsavel").value;
-            
-            // Adicione a pessoa responsável à atividade em andamento
-            tarefaEmAndamento.responsavel = responsavel;
-            
-            atividadesEmAndamento.push(tarefaEmAndamento);
-            tarefas = salvarDados("tarefas", tarefas);
-            atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
-            exibirDados(tarefas, "listaTarefas");
-            exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
-            
-            // Limpe o campo de entrada da pessoa responsável
-            document.getElementById("responsavel").value = "";
-            // Defina o placeholder novamente
-            document.getElementById("responsavel").placeholder = "Responsável pela Tarefa";
-        }
+    var tarefaEmAndamento = tarefas.splice(index, 1)[0];
+    
+    // Obtenha a pessoa responsável da entrada correspondente
+    var responsavel = document.getElementById("responsavel").value;
+    
+    // Adicione a pessoa responsável à atividade em andamento
+    tarefaEmAndamento.responsavel = responsavel;
+    
+    atividadesEmAndamento.push(tarefaEmAndamento);
+    tarefas = salvarDados("tarefas", tarefas);
+    atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
+    exibirDados(tarefas, "listaTarefas");
+    exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
+    
+    // Limpe o campo de entrada da pessoa responsável
+    document.getElementById("responsavel").value = "";
+    // Defina o placeholder novamente
+    document.getElementById("responsavel").placeholder = "Responsável pela Tarefa";
+}
+
+
 
         // Função para cadastrar uma atividade em andamento
         function cadastrarAtividade(index) {
@@ -211,6 +216,19 @@ function isNumber(event) {
             exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
             exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
         }
+        // Função para preencher o campo "Data de Vencimento" com a data de hoje
+        function preencherDataDeHoje() {
+            var dataDeHoje = new Date();
+            var ano = dataDeHoje.getFullYear();
+            var mes = (dataDeHoje.getMonth() + 1).toString().padStart(2, '0'); // O mês é base 0, então somamos 1 e formatamos com dois dígitos.
+            var dia = dataDeHoje.getDate().toString().padStart(2, '0'); // Formata o dia com dois dígitos.
+            
+            var dataFormatada = `${ano}-${mes}-${dia}`; // Formato: "YYYY-MM-DD"
+
+            // Define o valor do campo "Data de Vencimento" com a data atual
+            document.getElementById("dataVencimento").value = dataFormatada;
+        }
+
 
         // Função para editar uma tarefa
         function editarTarefa(index, emAndamento = false) {
@@ -236,6 +254,7 @@ function isNumber(event) {
                 atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
                 exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
             } else {
+                
                 tarefas = salvarDados("tarefas", tarefas);
                 exibirDados(tarefas, "listaTarefas");
             }
