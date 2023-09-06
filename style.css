@@ -22,11 +22,12 @@ body {
 }
 
 h1 {
-    color: #333;
+    color: #000;
+    
 }
 
 h2 {
-    color: #555;
+    color: #000000b0;
 }
 
 p {
@@ -49,11 +50,12 @@ button {
    
 }
 li {
+    border: 2px solid #0cca1c;
     text-align: center;
     font-size: 18px;
     line-height:50px;
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 0px;
     max-width:85%;
     font-weight: 600;
     
@@ -128,7 +130,7 @@ button:hover {
 
 .tarefaVencida {
     
-    background-color: #34e797c4;
+    background-color: #9cf3cc96;
     border-radius: 30px;
 
 }
