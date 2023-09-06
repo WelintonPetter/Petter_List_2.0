@@ -1,26 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    
     <title>Lista de Tarefas com Prioridades, Prazo Máximo e Edição</title>
-    <style>
-        .prioridadeSelecionada {
-            font-size: 20px;
-        }
-        .tarefaRealizada {
-            background-color: blue;
-            color: white;
-        }
-        .tarefaVencida {
-            background-color: red;
-            color: white;
-        }
-        .atrasada {
-            text-decoration: line-through;
-        }
-    </style>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Minha Lista de Tarefas</h1>
+    <div class="container">
+        <h1 >Minha Lista de Tarefas</h1>
 
     <h2>Prioridades:</h2>
     <div id="prioridadeButtons">
@@ -32,8 +20,10 @@
     <input type="hidden" id="prioridade" value="green"> <!-- Valor padrão para a prioridade -->
 
     <input type="text" id="tarefa" placeholder="O Que Aconteceu ?">
-    <input type="text"id="numeroOs"placeholder="Número de OS"onkeypress="return isNumber(event)"
->
+    <input type="text" id="numeroOs" placeholder="Número de OS" oninput="validarNumeroOs(this)">
+
+
+
     <input type="text" id="placeholderConcatenar" placeholder="Setor:">
     
     <!-- Adicione um campo de entrada para a pessoa responsável -->
@@ -41,327 +31,42 @@
 
     <!-- Adicione um campo de entrada de data -->
     <input type="date" id="dataVencimento" placeholder="Data de Vencimento">
-    <button onclick="preencherDataDeHoje()">Preencher com a Data de Hoje</button>
+    <button onclick="preencherDataDeHoje()">Hoje</button>
 
     
     <!-- Adicione um campo de entrada para o prazo máximo -->
     <input type="number" id="prazoMaximo" placeholder="Prazo Máximo (em dias)">
 
-    <button onclick="adicionarOuConcatenarTarefa()">Cadastrar Atividade</button>
+    <button id="cadastrarAtividadeButton" onclick="adicionarOuConcatenarTarefa()" disabled>Cadastrar Atividade</button>
+
+<div class="Tarefas">
 
     <h2>Tarefas:</h2>
     <ul id="listaTarefas"></ul>
+    
+</div>
+    
 
     <h2>Atividades em Andamento:</h2>
     <ul id="listaAtividadesEmAndamento"></ul>
 
-    <h2>Atividades Realizadas:</h2>asdasdsa
+    <h2>Atividades Realizadas:</h2>
     <ul id="listaAtividadesRealizadas"></ul>
 
-    <script>
-        var tarefas = []; // Array para armazenar as tarefas
-        var atividadesEmAndamento = []; // Array para armazenar as atividades em andamento
-        var atividadesRealizadas = []; // Array para armazenar as atividades realizadas
-
-        // Função para salvar os dados no Local Storage e retornar os dados atualizados
-        function salvarDados(chave, dados) {
-            localStorage.setItem(chave, JSON.stringify(dados));
-            return dados; // Retorna os dados atualizados
-        }
-
-        // Função para carregar os dados do Local Storage
-        function carregarDados(chave, array) {
-            var dadosSalvos = localStorage.getItem(chave);
-            if (dadosSalvos) {
-                array = JSON.parse(dadosSalvos);
-                return array;
-            }
-            return array;
-        }
-// Função para verificar se o evento contém um número
-function isNumber(event) {
-    var charCode = event.which || event.keyCode;
-
-    // Garanta que apenas números sejam aceitos (códigos de tecla 48 a 57 são números)
-    if (charCode < 48 || charCode > 57) {
-        event.preventDefault();
-        return false;
-    }
-
-    return true;
-}
-
-        
-
-        // Função para exibir os dados em uma lista
-        function exibirDados(array, listaId) {
-            var lista = document.getElementById(listaId);
-            lista.innerHTML = "";
-
-            for (var i = 0; i < array.length; i++) {
-                var item = array[i];
-                var novoItem = document.createElement("li");
-
-                // Verifica se o item está vencido
-                var dataVencimento = new Date(item.dataVencimento);
-                var hoje = new Date();
-                if (dataVencimento < hoje) {
-                    novoItem.classList.add("tarefaVencida");
-                }
-
-                // Verifica se a atividade está atrasada com base no prazo máximo
-                var prazoMaximo = parseInt(item.prazoMaximo);
-                if (!isNaN(prazoMaximo)) {
-                    var dataLimite = new Date(item.dataVencimento);
-                    dataLimite.setDate(dataLimite.getDate() + prazoMaximo);
-                    if (hoje > dataLimite) {
-                        novoItem.classList.add("atrasada");
-                    }
-                }
-
-                var descricao = `Acontecido: ${item.tarefa} - OS ${item.numeroOs} - Setor: ${item.textoConcatenar} - Responsável: ${item.responsavel} - Vencimento: ${item.dataVencimento}`;
-
-                novoItem.innerHTML = `<span style="color: ${item.prioridade};">${descricao}</span>`;
-
-                if (listaId === "listaTarefas") {
-                    var botaoIniciar = document.createElement("button");
-                    botaoIniciar.innerText = "Iniciar Atividade";
-                    botaoIniciar.onclick = function(index) {
-                        return function() {
-                            marcarTarefaEmAndamento(index);
-                        }
-                    }(i);
-                    novoItem.appendChild(botaoIniciar);
-
-                    var botaoEditar = document.createElement("button");
-                    botaoEditar.innerText = "Editar";
-                    botaoEditar.onclick = function(index) {
-                        return function() {
-                            editarTarefa(index);
-                        }
-                    }(i);
-                    novoItem.appendChild(botaoEditar);
-
-                    var botaoExcluir = document.createElement("button");
-                    botaoExcluir.innerText = "Excluir";
-                    botaoExcluir.onclick = function(index) {
-                        return function() {
-                            excluirTarefa(index);
-                        }
-                    }(i);
-                    novoItem.appendChild(botaoExcluir);
-                } else if (listaId === "listaAtividadesEmAndamento") {
-                    var botaoFinalizar = document.createElement("button");
-                    botaoFinalizar.innerText = "Finalizar Atividade";
-                    botaoFinalizar.onclick = function(index) {
-                        return function() {
-                            cadastrarAtividade(index);
-                        }
-                    }(i);
-                    novoItem.appendChild(botaoFinalizar);
-
-                    var botaoEditarEmAndamento = document.createElement("button");
-                    botaoEditarEmAndamento.innerText = "Editar";
-                    botaoEditarEmAndamento.onclick = function(index) {
-                        return function() {
-                            editarTarefa(index, true);
-                        }
-                    }(i);
-                    novoItem.appendChild(botaoEditarEmAndamento);
-                } else if (listaId === "listaAtividadesRealizadas") {
-                    var botaoApagar = document.createElement("button");
-                    botaoApagar.innerText = "Apagar";
-                    botaoApagar.onclick = function(index) {
-                        return function() {
-                            apagarAtividadeRealizada(index);
-                        }
-                    }(i);
-                    novoItem.appendChild(botaoApagar);
-                }
-
-                lista.appendChild(novoItem);
-            }
-        }
-
-        // Função para marcar uma tarefa como em andamento
-        function marcarTarefaEmAndamento(index) {
-    var tarefaEmAndamento = tarefas.splice(index, 1)[0];
+    <script src="https://kit.fontawesome.com/3b98d3f804.js" crosso0rigin="anonymous"></script>
+    <script src="./scripts.js"></script>
     
-    // Obtenha a pessoa responsável da entrada correspondente
-    var responsavel = document.getElementById("responsavel").value;
+
+    </div>
     
-    // Adicione a pessoa responsável à atividade em andamento
-    tarefaEmAndamento.responsavel = responsavel;
-    
-    atividadesEmAndamento.push(tarefaEmAndamento);
-    tarefas = salvarDados("tarefas", tarefas);
-    atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
-    exibirDados(tarefas, "listaTarefas");
-    exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
-    
-    // Limpe o campo de entrada da pessoa responsável
-    document.getElementById("responsavel").value = "";
-    // Defina o placeholder novamente
-    document.getElementById("responsavel").placeholder = "Responsável pela Tarefa";
-}
-
-
-
-        // Função para cadastrar uma atividade em andamento
-        function cadastrarAtividade(index) {
-            var atividade = atividadesEmAndamento.splice(index, 1)[0];
-            atividadesRealizadas.push(atividade);
-            atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
-            atividadesRealizadas = salvarDados("atividadesRealizadas", atividadesRealizadas);
-            exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
-            exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
-        }
-        // Função para preencher o campo "Data de Vencimento" com a data de hoje
-        function preencherDataDeHoje() {
-            var dataDeHoje = new Date();
-            var ano = dataDeHoje.getFullYear();
-            var mes = (dataDeHoje.getMonth() + 1).toString().padStart(2, '0'); // O mês é base 0, então somamos 1 e formatamos com dois dígitos.
-            var dia = dataDeHoje.getDate().toString().padStart(2, '0'); // Formata o dia com dois dígitos.
-            
-            var dataFormatada = `${ano}-${mes}-${dia}`; // Formato: "YYYY-MM-DD"
-
-            // Define o valor do campo "Data de Vencimento" com a data atual
-            document.getElementById("dataVencimento").value = dataFormatada;
-        }
-
-
-        // Função para editar uma tarefa
-        function editarTarefa(index, emAndamento = false) {
-            var array = emAndamento ? atividadesEmAndamento : tarefas;
-            var tarefa = array[index];
-            
-            // Preencha os campos de entrada com os valores atuais
-            document.getElementById("tarefa").value = tarefa.tarefa;
-            document.getElementById("numeroOs").value = tarefa.numeroOs;
-            document.getElementById("placeholderConcatenar").value = tarefa.textoConcatenar;
-            document.getElementById("prioridade").value = tarefa.prioridade;
-            document.getElementById("dataVencimento").value = tarefa.dataVencimento;
-            document.getElementById("prazoMaximo").value = tarefa.prazoMaximo;
-            
-            // Preencha o campo de responsável
-            document.getElementById("responsavel").value = tarefa.responsavel;
-            
-            // Remova a tarefa do array
-            array.splice(index, 1);
-            
-            // Atualize a lista de tarefas em andamento ou tarefas
-            if (emAndamento) {
-                atividadesEmAndamento = salvarDados("atividadesEmAndamento", atividadesEmAndamento);
-                exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
-            } else {
+    <div class="rodape">
                 
-                tarefas = salvarDados("tarefas", tarefas);
-                exibirDados(tarefas, "listaTarefas");
-            }
-        }
-
-        // Função para apagar uma tarefa
-        function excluirTarefa(index) {
-            var confirmacao = confirm("Tem certeza de que deseja excluir esta tarefa?");
-            if (confirmacao) {
-                tarefas.splice(index, 1);
-                tarefas = salvarDados("tarefas", tarefas);
-                exibirDados(tarefas, "listaTarefas");
-            }
-        }
-
-        // Função para apagar uma atividade realizada específica com confirmação
-        function apagarAtividadeRealizada(index) {
-            var confirmacao = confirm("Tem certeza de que deseja apagar esta atividade realizada?");
-            if (confirmacao) {
-                atividadesRealizadas.splice(index, 1);
-                atividadesRealizadas = salvarDados("atividadesRealizadas", atividadesRealizadas);
-                exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
-            }
-        }
-
-        // Função para adicionar ou concatenar uma tarefa
-        function adicionarOuConcatenarTarefa() {
-            var tarefa = document.getElementById("tarefa").value;
-            if (tarefa === "") {
-                alert("Por favor, digite uma tarefa.");
-                return;
-            }
-
-            // Obtém a prioridade atual selecionada
-            var prioridade = document.getElementById("prioridade").value;
-
-            // Obtém o número de OS
-            var numeroOs = document.getElementById("numeroOs").value;
-
-            // Obtém o texto para concatenar
-            var textoConcatenar = document.getElementById("placeholderConcatenar").value;
-
-            // Obtém a data de vencimento e valide-a
-            var dataVencimento = document.getElementById("dataVencimento").value;
-            if (!dataVencimento) {
-                alert("Por favor, selecione uma data de vencimento.");
-                return;
-            }
-
-            // Converta a data de vencimento em um objeto Date e verifique se é uma data válida
-            var dataVencimentoObj = new Date(dataVencimento);
-            if (isNaN(dataVencimentoObj.getTime())) {
-                alert("A data de vencimento inserida não é válida.");
-                return;
-            }
-
-            // Obtém o prazo máximo (em dias)
-            var prazoMaximo = document.getElementById("prazoMaximo").value;
-
-            // Obtém a pessoa responsável
-            var responsavel = document.getElementById("responsavel").value;
-
-            // Adiciona a tarefa ao array
-            tarefas.push({ tarefa, prioridade, numeroOs, textoConcatenar, dataVencimento, prazoMaximo, responsavel });
-
-            // Salva as tarefas no Local Storage
-            tarefas = salvarDados("tarefas", tarefas);
-
-            // Limpa os campos de entrada
-            document.getElementById("tarefa").value = "";
-            document.getElementById("numeroOs").value = "";
-            document.getElementById("placeholderConcatenar").value = "";
-            document.getElementById("dataVencimento").value = "";
-            document.getElementById("prazoMaximo").value = "";
-            document.getElementById("responsavel").value = "";
-
-            // Atualiza o placeholder do input de responsável para "Responsável pela Tarefa"
-            document.getElementById("responsavel").placeholder = "Responsável pela Tarefa";
-
-            // Atualiza a lista de tarefas
-            exibirDados(tarefas, "listaTarefas");
-        }
-
-        // Função para definir a prioridade
-        function definirPrioridade(cor) {
-            document.getElementById("prioridade").value = cor;
-
-            // Define a classe de prioridade selecionada para o botão atual
-            var buttons = document.querySelectorAll("#prioridadeButtons button");
-            buttons.forEach(function(button) {
-                button.classList.remove("prioridadeSelecionada");
-                if (button.getAttribute("data-cor") === cor) {
-                    button.classList.add("prioridadeSelecionada");
-                }
-            });
-        }
-
-        // Carrega os dados do Local Storage ao carregar a página
-        tarefas = carregarDados("tarefas", tarefas);
-        atividadesEmAndamento = carregarDados("atividadesEmAndamento", atividadesEmAndamento);
-        atividadesRealizadas = carregarDados("atividadesRealizadas", atividadesRealizadas);
-
-        // Exibe os dados carregados
-        exibirDados(tarefas, "listaTarefas");
-        exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
-        exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
-    </script>
+        <p> Desenvolvido por <span>"Welinton Petter"</span></p>
+        <p>Copyright © 2023</p>
+    </div>
+    
+   
+    
 </body>
 
 </html>
