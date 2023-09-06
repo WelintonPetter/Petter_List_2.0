@@ -156,8 +156,17 @@ button:hover {
     color: #fff;
 }
 
-.rodape span {
+.rodape span a {
     font-weight: bold;
+    font-size: 10px;
+    color: #fff;
+    text-decoration: none;
 }
 
-/* ... (seu código anterior) */
+
+/* Remove o sublinhado de links visitados */
+.rodape span a:visited {
+    text-decoration: none;
+}
+
+
