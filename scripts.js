@@ -125,6 +125,7 @@ function isNumber(event) {
         if (listaId === "listaTarefas" || listaId === "listaAtividadesEmAndamento") {
             document.getElementById("responsavel").value = item.responsavel;
         }
+        
     }
 }
 
