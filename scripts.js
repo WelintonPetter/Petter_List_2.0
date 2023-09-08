@@ -117,6 +117,7 @@ function isNumber(event) {
             }(i);
             novoItem.appendChild(botaoApagar);
         }
+        
 
         // Adicione o novoItem à lista
         lista.appendChild(novoItem);
@@ -215,6 +216,9 @@ function editarTarefa(index, emAndamento = false) {
             exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
             exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
         }
+
+
+        
         // Função para preencher o campo "Data de Vencimento" com a data de hoje
         function preencherDataDeHoje() {
             var dataDeHoje = new Date();
