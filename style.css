@@ -145,25 +145,31 @@ button:hover {
 
 /* ... (seu código anterior) */
 
+/* Estilizando o rodapé */
 .rodape {
     background-color: #33333350; /* Cor de fundo do rodapé */
     text-align: center; /* Alinhar o texto ao centro */
-    padding: 1px 1px; /* Espaçamento interno do rodapé */
-    position: absolute; /* Colocar o rodapé no rodapé da página */
+    padding: 10px; /* Espaçamento interno do rodapé (aumentei para 10px para maior visibilidade) */
+    position: fixed; /* Colocar o rodapé no rodapé da janela do navegador */
     bottom: 0; /* Fixar o rodapé na parte inferior */
     width: 100%; /* Largura total do rodapé */
 }
-.rodape p{
-    font-size: 10px;
+
+/* Estilizando o texto dentro do rodapé */
+.rodape p {
+    font-size: 12px; /* Aumentei o tamanho da fonte para 12px para melhor legibilidade */
     color: #fff;
+    margin: 0; /* Removi a margem para evitar espaçamento indesejado */
 }
 
+/* Estilizando os links dentro do rodapé */
 .rodape span a {
     font-weight: bold;
-    font-size: 10px;
+    font-size: 12px; /* Aumentei o tamanho da fonte para 12px para combinar com o texto */
     color: #fff;
     text-decoration: none;
 }
+
 
 
 /* Remove o sublinhado de links visitados */
