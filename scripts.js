@@ -30,6 +30,10 @@ function isNumber(event) {
     return true;
 }
 
+
+
+  
+      
         
 
         // Função para exibir os dados em uma lista
@@ -71,16 +75,15 @@ function isNumber(event) {
                 }
             }(i);
             novoItem.appendChild(botaoIniciar);
-
+        
             var botaoEditar = document.createElement("button");
             botaoEditar.innerText = "Editar";
             botaoEditar.onclick = function(index) {
                 return function() {
-                    editarTarefa(index);
+                    editarTarefa(index); // Chame a função editarTarefa para editar a tarefa
                 }
             }(i);
-            novoItem.appendChild(botaoEditar);
-
+        
             var botaoExcluir = document.createElement("button");
             botaoExcluir.innerText = "Excluir";
             botaoExcluir.onclick = function(index) {
@@ -88,7 +91,11 @@ function isNumber(event) {
                     excluirTarefa(index);
                 }
             }(i);
+        
+            novoItem.appendChild(botaoEditar); // Adicione o botão "Editar" à tarefa
             novoItem.appendChild(botaoExcluir);
+        
+        
         } else if (listaId === "listaAtividadesEmAndamento") {
             var botaoFinalizar = document.createElement("button");
             botaoFinalizar.innerText = "Finalizar Atividade";
@@ -126,7 +133,20 @@ function isNumber(event) {
         if (listaId === "listaTarefas" || listaId === "listaAtividadesEmAndamento") {
             document.getElementById("responsavel").value = item.responsavel;
         }
+        var botaoGerarQRCode = document.createElement("button");
+                botaoGerarQRCode.innerText = "Gerar QR Code";
+                botaoGerarQRCode.onclick = function(item) {
+                    return function() {
+                        gerarQRCode(item, novoItem);
+                    };
+                }(item);
+                novoItem.appendChild(botaoGerarQRCode);
         
+                // ... Resto do seu código ...
+        
+                // Adicione o novoItem à lista
+                lista.appendChild(novoItem);
+
     }
 }
 
@@ -154,6 +174,34 @@ function isNumber(event) {
     document.getElementById("responsavel").placeholder = "Responsável pela Tarefa";
 }
 
+function gerarQRCode(item, elementoLista) {
+    // Verifique se já existe um QR code na linha
+    if (elementoLista.querySelector('img[data-qr-generated]')) {
+        return;
+    }
+
+    var textoQRCode = `Tarefa: ${item.tarefa}\nNúmero OS: ${item.numeroOs}\nSetor: ${item.textoConcatenar}\nResponsável: ${item.responsavel}\nVencimento: ${item.dataVencimento}`;
+
+    // Construa a URL da API com o texto codificado
+    var qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(textoQRCode)}&size=80x80`;
+
+    // Crie um elemento <img> para exibir o código QR
+    var qrCodeImg = document.createElement('img');
+    qrCodeImg.src = qrCodeUrl;
+    qrCodeImg.alt = "Código QR";
+
+    // Defina um atributo personalizado para marcar que o QR code foi gerado
+    qrCodeImg.setAttribute('data-qr-generated', 'true');
+
+    // Insira o código QR no elemento de lista correspondente
+    elementoLista.appendChild(qrCodeImg);
+}
+
+
+
+
+
+
 function validarNumeroOs(input) {
     // Remove qualquer caractere não numérico do valor do campo
     input.value = input.value.replace(/\D/g, '');
@@ -179,6 +227,62 @@ function validarNumeroOs(input) {
 botaoSemOs.addEventListener("click", function () {
     validarNumeroOs(document.getElementById("numeroOs"));
 });
+// ... (Código anterior)
+
+// Adicione esta função para verificar o campo "numeroOs" automaticamente
+function verificarNumeroOs() {
+    var campoNumeroOs = document.getElementById("numeroOs");
+    var cadastrarAtividadeButton = document.getElementById("cadastrarAtividadeButton");
+
+    if (campoNumeroOs.value.length === 7) {
+        cadastrarAtividadeButton.removeAttribute("disabled");
+    } else {
+        cadastrarAtividadeButton.setAttribute("disabled", "true");
+    }
+}
+
+// Adicione um evento de escuta para o campo "numeroOs" quando a entrada é alterada
+var campoNumeroOs = document.getElementById("numeroOs");
+campoNumeroOs.addEventListener("input", verificarNumeroOs);
+
+// Adicione um evento de escuta para o campo "numeroOs" quando a tecla Enter é pressionada
+campoNumeroOs.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        verificarNumeroOs();
+    }
+});
+
+// Chame a função inicialmente para verificar o estado inicial do campo
+verificarNumeroOs();
+
+// Função para preencher o campo "Data de Vencimento" com a data de hoje
+function preencherDataDeHoje() {
+    var dataDeHoje = new Date();
+    var ano = dataDeHoje.getFullYear();
+    var mes = (dataDeHoje.getMonth() + 1).toString().padStart(2, '0');
+    var dia = dataDeHoje.getDate().toString().padStart(2, '0');
+    
+    var dataFormatada = `${ano}-${mes}-${dia}`;
+    document.getElementById("dataVencimento").value = dataFormatada;
+}
+
+function preencherNumeroOsPadrao() {
+    var campoNumeroOs = document.getElementById("numeroOs");
+    campoNumeroOs.value = "0000000";
+}
+
+// ... (Restante do código)
+
+// Carrega os dados do Local Storage ao carregar a página
+tarefas = carregarDados("tarefas", tarefas);
+atividadesEmAndamento = carregarDados("atividadesEmAndamento", atividadesEmAndamento);
+atividadesRealizadas = carregarDados("atividadesRealizadas", atividadesRealizadas);
+
+// Exibe os dados carregados
+exibirDados(tarefas, "listaTarefas");
+exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
+exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
+
 
 }
 

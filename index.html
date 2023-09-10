@@ -3,7 +3,7 @@
 <head>
     
     <title>Lista de Tarefas com Prioridades, Prazo Máximo e Edição</title>
-    
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -41,6 +41,7 @@
     
     <!-- Adicione um campo de entrada para o prazo máximo -->
     <input type="number" id="prazoMaximo" placeholder="Prazo Máximo (em dias)">
+    
 
     <button id="cadastrarAtividadeButton" onclick="adicionarOuConcatenarTarefa()" disabled>Cadastrar Atividade</button>
 
@@ -50,6 +51,7 @@
     <ul id="listaTarefas"></ul>
     
 </div>
+
     
 
     <h2>Atividades em Andamento:</h2>
