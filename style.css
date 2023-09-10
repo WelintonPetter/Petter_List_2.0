@@ -178,3 +178,16 @@ button:hover {
 }
 
 
+/* Estilo para o campo de entrada "numeroOs" quando for inválido */
+#numeroOs:invalid {
+    border: 2px solid red;
+}
+
+/* Estilo para o texto do placeholder do "numeroOs" quando for inválido */
+#numeroOs:invalid::placeholder {
+    color: red;
+}
+
+
+
+

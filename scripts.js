@@ -172,7 +172,59 @@ function validarNumeroOs(input) {
     } else {
         cadastrarAtividadeButton.disabled = true;
     }
+    // Seletor para o botão "Sem OS"
+    var botaoSemOs = document.getElementById("botaoSemOs");
+
+// Adicionar um ouvinte de evento de clique ao botão
+botaoSemOs.addEventListener("click", function () {
+    validarNumeroOs(document.getElementById("numeroOs"));
+});
+
 }
+
+// Adicione esta função para verificar o campo "numeroOs" automaticamente
+// Adicione esta função para verificar o campo "numeroOs" quando a entrada é alterada
+function verificarNumeroOs() {
+    var campoNumeroOs = document.getElementById("numeroOs");
+    var cadastrarAtividadeButton = document.getElementById("cadastrarAtividadeButton");
+
+    if (campoNumeroOs.value.length === 7) {
+        cadastrarAtividadeButton.removeAttribute("disabled");
+    } else {
+        cadastrarAtividadeButton.setAttribute("disabled", "true");
+    }
+}
+
+// Adicione um evento de escuta para o campo "numeroOs" quando a entrada é alterada
+var campoNumeroOs = document.getElementById("numeroOs");
+campoNumeroOs.addEventListener("input", verificarNumeroOs);
+
+// Adicione um evento de escuta para o campo "numeroOs" quando a tecla Enter é pressionada
+campoNumeroOs.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        verificarNumeroOs();
+    }
+});
+
+// Chame a função inicialmente para verificar o estado inicial do campo
+verificarNumeroOs();
+
+
+// Adicione um evento de escuta para o campo "numeroOs"
+var campoNumeroOs = document.getElementById("numeroOs");
+campoNumeroOs.addEventListener("input", verificarNumeroOs);
+
+// Chame a função inicialmente para verificar o estado inicial do campo
+verificarNumeroOs();
+
+
+// Adicione um evento de escuta para o campo "numeroOs"
+var campoNumeroOs = document.getElementById("numeroOs");
+campoNumeroOs.addEventListener("input", verificarNumeroOs);
+
+// Chame a função inicialmente para verificar o estado inicial do campo
+verificarNumeroOs();
+
 
 
 
@@ -231,6 +283,12 @@ function editarTarefa(index, emAndamento = false) {
             // Define o valor do campo "Data de Vencimento" com a data atual
             document.getElementById("dataVencimento").value = dataFormatada;
         }
+        function preencherNumeroOsPadrao() {
+            var campoNumeroOs = document.getElementById("numeroOs");
+            campoNumeroOs.value = "0000000";
+            
+        }
+        
 
 
         // Função para editar uma tarefa
@@ -354,6 +412,7 @@ function editarTarefa(index, emAndamento = false) {
                 }
             });
         }
+        
 
         // Carrega os dados do Local Storage ao carregar a página
         tarefas = carregarDados("tarefas", tarefas);
@@ -364,4 +423,3 @@ function editarTarefa(index, emAndamento = false) {
         exibirDados(tarefas, "listaTarefas");
         exibirDados(atividadesEmAndamento, "listaAtividadesEmAndamento");
         exibirDados(atividadesRealizadas, "listaAtividadesRealizadas");
-  

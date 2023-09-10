@@ -20,7 +20,12 @@
     <input type="hidden" id="prioridade" value="green"> <!-- Valor padrão para a prioridade -->
 
     <input type="text" id="tarefa" placeholder="O Que Aconteceu ?">
-    <input type="text" id="numeroOs" placeholder="Número de OS" oninput="validarNumeroOs(this)">
+    
+
+    <input type="text" id="numeroOs" placeholder="Número de OS" oninput="validarNumeroOs(this)" required>
+
+    <button onclick="preencherNumeroOsPadrao()">Sem OS</button>
+
 
 
 
@@ -30,7 +35,7 @@
     <input type="text" id="responsavel" placeholder="Responsável pela Tarefa">
 
     <!-- Adicione um campo de entrada de data -->
-    <input type="date" id="dataVencimento" placeholder="Data de Vencimento">
+    <input type="date" id="dataVencimento" placeholder="Data de Vencimento"required >
     <button onclick="preencherDataDeHoje()">Hoje</button>
 
     
